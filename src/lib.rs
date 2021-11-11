@@ -987,7 +987,7 @@ pub mod pallet {
 
 	#[pallet::storage]
 	/// Details of an asset.
-	pub type Asset<T: Config> = StorageMap<
+	pub(super) type Asset<T: Config> = StorageMap<
 		_,
 		Blake2_128Concat,
 		T::AssetId,
@@ -995,7 +995,7 @@ pub mod pallet {
 	>;
 	#[pallet::storage]
 	/// The number of units of assets held by any given account.
-	pub type Account<T: Config> = StorageDoubleMap<
+	pub(super) type Account<T: Config> = StorageDoubleMap<
 		_,
 		Blake2_128Concat,
 		T::AssetId,
@@ -1006,7 +1006,7 @@ pub mod pallet {
 	>;
 	#[pallet::storage]
 	/// Metadata of an asset.
-	pub type Metadata<T: Config> = StorageMap<
+	pub(super) type Metadata<T: Config> = StorageMap<
 		_,
 		Blake2_128Concat,
 		T::AssetId,
