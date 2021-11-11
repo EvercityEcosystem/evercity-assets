@@ -1,11 +1,11 @@
 [package]
 name = "pallet-evercity-assets"
-version = "3.0.0"
+version = "0.1.0"
 authors = ["Parity Technologies <admin@parity.io>"]
 edition = "2018"
 license = "Apache-2.0"
 homepage = "https://substrate.dev"
-repository = "https://github.com/paritytech/substrate/"
+# repository = "https://github.com/paritytech/substrate/"
 description = "FRAME asset management pallet"
 readme = "README.md"
 
