@@ -1088,6 +1088,13 @@ impl<T: Config> Pallet<T> {
 		Asset::<T>::get(id).map(|x| x.supply).unwrap_or_else(Zero::zero)
 	}
 
+	pub fn get_asset_details(id: T::AssetId) -> 
+		Option<AssetDetails<<T as pallet::Config>::Balance, <T as frame_system::Config>::AccountId, 
+		<<T as pallet::Config>::Currency as frame_support::traits::Currency<<T as frame_system::Config>::AccountId>>::Balance>>
+	{ 
+		Asset::<T>::get(id)
+	}
+
 	/// Check the number of zombies allow yet for an asset.
 	pub fn zombie_allowance(id: T::AssetId) -> u32 {
 		Asset::<T>::get(id).map(|x| x.max_zombies - x.zombies).unwrap_or_else(Zero::zero)
