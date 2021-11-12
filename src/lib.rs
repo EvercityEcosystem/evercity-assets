@@ -424,6 +424,7 @@ pub mod pallet {
 		///
 		/// Weight: `O(1)`
 		/// Modes: Post-existence of `who`; Pre & post Zombie-status of `who`.
+		#[deprecated(since="0.1.0", note="please use `burn_self_assets` instead")]
 		#[pallet::weight(T::WeightInfo::burn())]
 		pub(super) fn burn(
 			origin: OriginFor<T>,
