@@ -1,7 +1,7 @@
 [package]
 name = "pallet-evercity-assets"
 version = "0.1.0"
-authors = ["Parity Technologies <admin@parity.io>"]
+authors = ["Parity Technologies <admin@parity.io>, Dima Bushuev diman1ghtly@gmail.com"]
 edition = "2018"
 license = "Apache-2.0"
 homepage = "https://substrate.dev"
