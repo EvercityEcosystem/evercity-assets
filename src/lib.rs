@@ -1100,6 +1100,16 @@ pub struct AssetDetails<
 	is_frozen: bool,
 }
 
+impl<
+	Balance: Encode + Decode + Clone + Debug + Eq + PartialEq,
+	AccountId: Encode + Decode + Clone + Debug + Eq + PartialEq,
+	DepositBalance: Encode + Decode + Clone + Debug + Eq + PartialEq,
+> AssetDetails<Balance, AccountId, DepositBalance> {
+	pub fn get_owner(&self) -> &AccountId {
+		&self.owner
+	}
+}
+
 #[derive(Clone, Encode, Decode, Eq, PartialEq, RuntimeDebug, Default)]
 pub struct AssetBalance<
 	Balance: Encode + Decode + Clone + Debug + Eq + PartialEq,
