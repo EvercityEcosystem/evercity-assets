@@ -409,60 +409,6 @@ pub mod pallet {
 			})
 		}
 
-		/// Reduce the balance of `who` by as much as possible up to `amount` assets of `id`.
-		///
-		/// Origin must be Signed and the sender should be the Manager of the asset `id`.
-		///
-		/// Bails with `BalanceZero` if the `who` is already dead.
-		///
-		/// - `id`: The identifier of the asset to have some amount burned.
-		/// - `who`: The account to be debited from.
-		/// - `amount`: The maximum amount by which `who`'s balance should be reduced.
-		///
-		/// Emits `Burned` with the actual amount burned. If this takes the balance to below the
-		/// minimum for the asset, then the amount burned is increased to take it to zero.
-		///
-		/// Weight: `O(1)`
-		/// Modes: Post-existence of `who`; Pre & post Zombie-status of `who`.
-		#[deprecated(since="0.1.0", note="please use `burn_self_assets` instead")]
-		#[pallet::weight(T::WeightInfo::burn())]
-		pub(super) fn burn(
-			origin: OriginFor<T>,
-			#[pallet::compact] id: T::AssetId,
-			who: <T::Lookup as StaticLookup>::Source,
-			#[pallet::compact] amount: T::Balance
-		) -> DispatchResultWithPostInfo {
-			let origin = ensure_signed(origin)?;
-			let who = T::Lookup::lookup(who)?;
-
-			Asset::<T>::try_mutate(id, |maybe_details| {
-				let d = maybe_details.as_mut().ok_or(Error::<T>::Unknown)?;
-				ensure!(&origin == &d.admin, Error::<T>::NoPermission);
-
-				let burned = Account::<T>::try_mutate_exists(
-					id,
-					&who,
-					|maybe_account| -> Result<T::Balance, DispatchError> {
-						let mut account = maybe_account.take().ok_or(Error::<T>::BalanceZero)?;
-						let mut burned = amount.min(account.balance);
-						account.balance -= burned;
-						*maybe_account = if account.balance < d.min_balance {
-							burned += account.balance;
-							Self::dead_account(&who, d, account.is_zombie);
-							None
-						} else {
-							Some(account)
-						};
-						Ok(burned)
-					}
-				)?;
-
-				d.supply = d.supply.saturating_sub(burned);
-
-				Self::deposit_event(Event::Burned(id, who, burned));
-				Ok(().into())
-			})
-		}
 
 		/// Reduce the balance of `who` by as much as possible up to `amount` assets of `id`.
 		///
@@ -1205,6 +1151,46 @@ impl<T: Config> Pallet<T> {
 			frame_system::Module::<T>::dec_consumers(who);
 		}
 		d.accounts = d.accounts.saturating_sub(1);
+	}
+
+
+	#[cfg(test)]
+	fn burn(
+		origin: T::Origin,
+		id: T::AssetId,
+		who: <T::Lookup as StaticLookup>::Source,
+		amount: T::Balance
+	) -> frame_support::dispatch::DispatchResultWithPostInfo {
+		let origin = frame_system::ensure_signed(origin)?;
+		let who = T::Lookup::lookup(who)?;
+
+		Asset::<T>::try_mutate(id, |maybe_details| {
+			let d = maybe_details.as_mut().ok_or(Error::<T>::Unknown)?;
+			ensure!(&origin == &d.admin, Error::<T>::NoPermission);
+
+			let burned = Account::<T>::try_mutate_exists(
+				id,
+				&who,
+				|maybe_account| -> Result<T::Balance, DispatchError> {
+					let mut account = maybe_account.take().ok_or(Error::<T>::BalanceZero)?;
+					let mut burned = amount.min(account.balance);
+					account.balance -= burned;
+					*maybe_account = if account.balance < d.min_balance {
+						burned += account.balance;
+						Self::dead_account(&who, d, account.is_zombie);
+						None
+					} else {
+						Some(account)
+					};
+					Ok(burned)
+				}
+			)?;
+
+			d.supply = d.supply.saturating_sub(burned);
+
+			Self::deposit_event(Event::Burned(id, who, burned));
+			Ok(().into())
+		})
 	}
 }
 
